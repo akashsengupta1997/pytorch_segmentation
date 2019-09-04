@@ -1,9 +1,9 @@
 import torch
 import os
-from skimage import io, transform
+from skimage import io
 import cv2
-import numpy as np
 from torch.utils.data import Dataset
+import numpy as np
 
 
 class SegmentationDataset(Dataset):
@@ -28,7 +28,7 @@ class SegmentationDataset(Dataset):
             index = index.tolist()
 
         image = io.imread(self.image_paths[index])
-        # mask = io.imread(self.label_paths[index], as_gray=True)
+        image = image.astype(float)/255.0
         mask = cv2.imread(self.label_paths[index], 0)
         sample = {"image": image, "mask": mask}
 
