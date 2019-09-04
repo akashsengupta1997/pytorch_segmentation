@@ -5,15 +5,17 @@ import cv2
 
 
 class Resize(object):
-    def __init__(self, height, width):
-        self.new_height = height
-        self.new_width = width
+    def __init__(self, image_height, image_width, mask_height, mask_width):
+        self.new_image_height = image_height
+        self.new_image_width = image_width
+        self.new_mask_height = mask_height
+        self.new_mask_width = mask_width
 
     def __call__(self, sample):
         image, mask = sample['image'], sample['mask']
-        image = transform.resize(image, (self.new_height, self.new_width),
+        image = transform.resize(image, (self.new_image_height, self.new_image_width),
                                  order=1)
-        mask = transform.resize(mask, (self.new_height, self.new_width),
+        mask = transform.resize(mask, (self.new_mask_height, self.new_mask_width),
                                 order=0,
                                 preserve_range=True)  # want to preserve labels range [0, num_classes]
         image = image.astype(np.float32)
