@@ -175,9 +175,5 @@ class PyramidPooling(nn.Module):
         return torch.cat(outputs_to_concat, dim=1)
 
 
-x = torch.from_numpy(np.random.randn(4, 2048, 32, 32).astype(np.float32))
-
-
-
 
 
