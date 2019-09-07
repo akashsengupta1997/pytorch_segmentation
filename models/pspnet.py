@@ -6,10 +6,9 @@ import torch
 
 
 class PSPNet(nn.Module):
-    def __init__(self, num_classes, resnet_type='50', in_channels=3, training=True):
+    def __init__(self, num_classes, resnet_type='50', in_channels=3):
         super(PSPNet, self).__init__()
 
-        self.training = training
         assert resnet_type in ['50', '101']
         if resnet_type == 50:
             num_units_list = [3, 4, 6, 3]
@@ -45,8 +44,6 @@ class PSPNet(nn.Module):
         self.convbnrelu4_aux = Conv2DBatchNormReLU(1024, 256, 3, 1, 1, bias=False)
         self.class_scores_aux = nn.Conv2d(256, num_classes, 1, 1, 0)
 
-        # Aux loss function
-
     def forward(self, x):
         input_shape = x.shape[2:]
 
@@ -75,14 +72,14 @@ class PSPNet(nn.Module):
         output = F.interpolate(x, size=input_shape, mode='bilinear', align_corners=True)
 
         if self.training:
-            return output, aux_output
+            return [output, aux_output]
         else:
             return output
 
-
-x = torch.from_numpy(np.random.randn(4, 3, 256, 256).astype(np.float32))
-psp = PSPNet(32)
-out, out_aux = psp(x)
-print(out.shape, out_aux.shape)
-
-#TODO auxiliary loss and weird caffe weights loading method rip
+#
+# x = torch.from_numpy(np.random.randn(2, 3, 256, 256).astype(np.float32))
+# psp = PSPNet(32)
+# out, out_aux = psp(x)
+# print(out.shape, out_aux.shape)
+#
+# #TODO auxiliary loss and weird caffe weights loading method rip
