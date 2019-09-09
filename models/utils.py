@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import numpy as np
 
 
 class Conv2DReLU(nn.Module):
@@ -50,6 +49,23 @@ class Conv2DBatchNormReLU(nn.Module):
 
     def forward(self, x):
         outputs = self.conv2d_bn_relu(x)
+        return outputs
+
+
+class Conv2DBatchNormPReLU(nn.Module):
+    def __init__(self, in_channels, n_filters, kernel_size, stride, padding, bias=True,
+                 dilation=1):
+        super(Conv2DBatchNormPReLU, self).__init__()
+
+        conv2d = nn.Conv2d(in_channels, n_filters, kernel_size, stride=stride, padding=padding,
+                           bias=bias, dilation=dilation)
+
+        self.conv2d_bn_prelu = nn.Sequential(conv2d,
+                                             nn.BatchNorm2d(n_filters),
+                                             nn.PReLU(n_filters))
+
+    def forward(self, x):
+        outputs = self.conv2d_bn_prelu(x)
         return outputs
 
 

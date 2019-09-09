@@ -1,8 +1,6 @@
 import torch.nn as nn
 from models.utils import Conv2DBatchNormReLU, ResidualBlock, PyramidPooling
 import torch.nn.functional as F
-import numpy as np
-import torch
 
 
 class PSPNet(nn.Module):
@@ -75,11 +73,3 @@ class PSPNet(nn.Module):
             return [output, aux_output]
         else:
             return output
-
-#
-# x = torch.from_numpy(np.random.randn(2, 3, 256, 256).astype(np.float32))
-# psp = PSPNet(32)
-# out, out_aux = psp(x)
-# print(out.shape, out_aux.shape)
-#
-# #TODO auxiliary loss and weird caffe weights loading method rip
