@@ -69,6 +69,24 @@ class Conv2DBatchNormPReLU(nn.Module):
         return outputs
 
 
+class ConvTransposed2DBatchNormPReLU(nn.Module):
+    def __init__(self, in_channels, n_filters, kernel_size, stride, padding, bias=True,
+                 dilation=1, output_padding=0):
+        super(ConvTransposed2DBatchNormPReLU, self).__init__()
+
+        conv_transposed2d = nn.ConvTranspose2d(in_channels, n_filters, kernel_size,
+                                               stride=stride,padding=padding, bias=bias,
+                                               dilation=dilation, output_padding=output_padding)
+
+        self.conv_transposed2d_bn_prelu = nn.Sequential(conv_transposed2d,
+                                                        nn.BatchNorm2d(n_filters),
+                                                        nn.PReLU(n_filters))
+
+    def forward(self, x):
+        outputs = self.conv_transposed2d_bn_prelu(x)
+        return outputs
+
+
 class ConvBottleNeckUnit(nn.Module):
     """
     Bottle-beck unit with projection shortcut (for matching channel dimension size) from
