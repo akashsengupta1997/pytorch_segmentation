@@ -72,8 +72,8 @@ class_weights = enet_style_bounded_log_weighting(label_dir, output_height, outpu
 # class_weights = median_frequency_balancing(label_dir, output_height, output_width,
 #                                                   num_classes)
 class_weights.to(device)
-# criterion = nn.CrossEntropyLoss(weight=class_weights)
-criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=class_weights)
+criterion = nn.CrossEntropyLoss(weight=class_weights)
+# criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=class_weights)
 optimiser = optim.Adam(model.parameters())
 
 trained_model = train_model(model,

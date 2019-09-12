@@ -100,6 +100,8 @@ class DownsamplingBottleneckUnit(nn.Module):
         n, c_conv, h, w = conv_branch.size()
         c_input = x.size()[1]
         padding_zeros = torch.zeros(n, c_conv-c_input, h, w)
+        if shortcut_branch.is_cuda:
+            padding_zeros = padding_zeros.cuda()
         shortcut_branch = torch.cat([shortcut_branch, padding_zeros], dim=1)
 
         outputs = self.final_prelu(shortcut_branch + conv_branch)
