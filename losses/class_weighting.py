@@ -1,7 +1,7 @@
 import os
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+import torch
 
 
 def pad_to_square_mask(mask):
@@ -40,6 +40,7 @@ def enet_style_bounded_log_weighting(mask_dir, mask_h, mask_w, num_classes, mask
                                  mask_format=mask_format)
     class_probabilities = np.divide(class_counts, np.sum(class_counts))
     class_weights = np.divide(1.0, np.log(c + class_probabilities))
+    class_weights = torch.from_numpy(class_weights.astype(np.float32))
 
     return class_weights
 
@@ -49,5 +50,6 @@ def median_frequency_balancing(mask_dir, mask_h, mask_w, num_classes, mask_forma
                                       mask_format=mask_format)
     median_freq = np.median(class_frequencies)
     class_weights = np.divide(median_freq, class_frequencies)
+    class_weights = torch.from_numpy(class_weights.astype(np.float32))
 
     return class_weights

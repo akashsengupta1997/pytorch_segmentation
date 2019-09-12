@@ -1,7 +1,5 @@
 import torch
-import torch.nn as nn
 import torch.optim as optim
-import numpy as np
 from torchvision import transforms
 from models.segnet import SegNet
 from models.unet import UNet
@@ -13,7 +11,6 @@ from data.dataset import SegmentationDataset, ImageFolder
 from data.tranforms import Resize, ToTensor, PadToSquare
 from train import train_model
 
-import matplotlib.pyplot as plt
 # --- Hyperparameters ---
 
 batch_size = 3
@@ -59,7 +56,6 @@ val_dataset = SegmentationDataset(image_dir=val_image_dir,
 monitor_dataset = ImageFolder(monitor_image_dir,
                               transform=dataset_transforms['val'])
 
-
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 print('Training images found: {}'.format(len(train_dataset)))
@@ -70,13 +66,12 @@ print('Device: {}'.format(device))
 # --- Model, loss and optimiser ---
 
 model = PSPNet(num_classes)
-# class_weights = enet_style_bounded_log_weighting(label_dir, output_height, output_width,
-#                                                  num_classes)
-class_weights = median_frequency_balancing(label_dir, output_height, output_width,
-                                                  num_classes)
-class_weights = torch.from_numpy(class_weights.astype(np.float32))
+class_weights = enet_style_bounded_log_weighting(label_dir, output_height, output_width,
+                                                 num_classes)
+# class_weights = median_frequency_balancing(label_dir, output_height, output_width,
+#                                                   num_classes)
 # criterion = nn.CrossEntropyLoss(weight=class_weights)
-criterion = cross_entropy_with_aux_loss_pspnet
+criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=class_weights)
 optimiser = optim.Adam(model.parameters())
 
 trained_model = train_model(model,
@@ -87,7 +82,7 @@ trained_model = train_model(model,
                             optimiser,
                             batch_size,
                             val_batch_size,
-                            model_save_path='./saved_models/pspnet_test.tar',
+                            model_save_path='./saved_models/lol.tar',
                             num_epochs=num_epochs,
                             batches_per_print=batches_per_print,
                             epochs_per_visualise=epochs_per_visualise,
