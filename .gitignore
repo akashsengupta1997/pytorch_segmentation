@@ -121,3 +121,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Mac folder stuff
+*.DS_Store
+
+# Pycharm
+.idea*
+
+# Training monitoring
+*monitor*

@@ -186,6 +186,9 @@ class PyramidPooling(nn.Module):
         for i in range(len(pool_sizes)):
             self.convs.append(Conv2DBatchNormReLU(in_channels, out_channels, 1, 1, 0))
 
+        # Set up convs for different levels of pyramid pooling as a ModuleList, so that when
+        # model.eval() is called, training is set to False for each conv.
+        self.convs_module_list = nn.ModuleList(self.convs)
         self.pool_sizes = pool_sizes
 
     def forward(self, x):
@@ -199,7 +202,7 @@ class PyramidPooling(nn.Module):
             strides.append((int(height/pool_size), int(width/pool_size)))
 
         outputs_to_concat = [x]
-        for i, (conv, pool_size) in enumerate(zip(self.convs, self.pool_sizes)):
+        for i, (conv, pool_size) in enumerate(zip(self.convs_module_list, self.pool_sizes)):
             pooled = F.avg_pool2d(x, kernel_sizes[i], stride=strides[i], padding=0)
             conved = conv(pooled)
             out = F.interpolate(conved, size=(height, width), mode='bilinear',

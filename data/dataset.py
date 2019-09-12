@@ -38,6 +38,28 @@ class SegmentationDataset(Dataset):
         return sample
 
 
+class ImageFolder(Dataset):
+    def __init__(self, image_dir, transform=None, image_format=".png"):
+        self.transform = transform
+        self.image_format = image_format
+
+        self.image_paths = [os.path.join(image_dir, f) for f in sorted(os.listdir(image_dir))
+                            if f.endswith(image_format)]
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, index):
+        if torch.is_tensor(index):
+            index = index.tolist()
+
+        image = io.imread(self.image_paths[index])
+        image = image.astype(float)/255.0
+
+        if self.transform:
+            image = self.transform(image)
+
+        return image
 
 
 
