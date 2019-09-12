@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch.optim as optim
 from torchvision import transforms
 from models.segnet import SegNet
@@ -65,11 +66,12 @@ print('Device: {}'.format(device))
 
 # --- Model, loss and optimiser ---
 
-model = PSPNet(num_classes)
+model = ENet(num_classes)
 class_weights = enet_style_bounded_log_weighting(label_dir, output_height, output_width,
                                                  num_classes)
 # class_weights = median_frequency_balancing(label_dir, output_height, output_width,
 #                                                   num_classes)
+class_weights.to(device)
 # criterion = nn.CrossEntropyLoss(weight=class_weights)
 criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=class_weights)
 optimiser = optim.Adam(model.parameters())
@@ -82,7 +84,8 @@ trained_model = train_model(model,
                             optimiser,
                             batch_size,
                             val_batch_size,
-                            model_save_path='./saved_models/lol.tar',
+                            './saved_models/enet_test.tar',
+                            device,
                             num_epochs=num_epochs,
                             batches_per_print=batches_per_print,
                             epochs_per_visualise=epochs_per_visualise,
@@ -91,4 +94,4 @@ trained_model = train_model(model,
 
 
 #TODO device and GPU
-#TODO loading model to resume training/for inference
+#TODO loading model to resume training

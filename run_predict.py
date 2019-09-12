@@ -34,6 +34,7 @@ predict_dataset = ImageFolder(predict_dir, transform=predict_transforms)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 print('Test images found: {}'.format(len(predict_dataset)))
+print('Device: {}'.format(device))
 
 
 # --- Model ---
@@ -46,5 +47,6 @@ predict(model,
         saved_model_path,
         predict_dataset,
         batch_size,
-        "./tests/")
+        "./tests/",
+        device)
 

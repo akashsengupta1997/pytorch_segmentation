@@ -1,23 +1,26 @@
-import copy
 import os
 import torch
 import numpy as np
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from vis_utils import visualise_images_masks, visualise_intermediate_training_outputs
 
 
-def predict(model, saved_model_path, predict_dataset, batch_size, save_dir):
+def predict(model, saved_model_path, predict_dataset, batch_size, save_dir, device):
 
     predict_dataloader = DataLoader(predict_dataset, batch_size=batch_size, shuffle=False)
 
-    checkpoint = torch.load(saved_model_path)
+    checkpoint = torch.load(saved_model_path, map_location=device)
     model.load_state_dict(checkpoint['model_state_dict'])
+    model.to(device)
     model.eval()
 
     with torch.no_grad():
         for num, images in enumerate(predict_dataloader):
+            images.to(device)
             outputs = model(images)
+
+            outputs.to('cpu')
+            images.to('cpu')
             seg_maps = np.argmax(np.transpose(outputs.detach().numpy(), [0, 2, 3, 1]), axis=-1)
             images = images.detach().numpy()
             images = np.transpose(images, [0, 2, 3, 1])

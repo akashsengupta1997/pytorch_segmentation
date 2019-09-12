@@ -6,7 +6,7 @@ from vis_utils import visualise_images_masks, visualise_intermediate_training_ou
 
 
 def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, optimiser,
-                batch_size, val_batch_size, model_save_path, num_epochs=100,
+                batch_size, val_batch_size, model_save_path, device, num_epochs=100,
                 batches_per_print=10, epochs_per_visualise=10, epochs_per_save=10,
                 visualise_training_data=False):
 
@@ -15,6 +15,8 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_epoch_val_loss = np.inf
+
+    model.to(device)
 
     for epoch in range(num_epochs):
         print('\nEpoch {}/{}'.format(epoch, num_epochs - 1))
@@ -28,11 +30,11 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
         for batch_num, samples_batch in enumerate(train_dataloader):
             images = samples_batch['image']
             masks = samples_batch['mask']
-
             # Visualise first batch of training data - useful to check if labels have been
             # loaded correctly + right transforms have been applied.
             if visualise_training_data and epoch == 0 and batch_num == 0:
                 visualise_images_masks(images, masks)
+            images, masks = images.to(device), masks.to(device)
 
             # Backpropagate
             optimiser.zero_grad()
@@ -55,6 +57,7 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
             for batch_num, samples_batch in enumerate(val_dataloader):
                 images = samples_batch['image']
                 masks = samples_batch['mask']
+                images, masks = images.to(device), masks.to(device)
                 outputs = model(images)
                 val_loss = criterion(outputs, masks)
 
@@ -81,7 +84,7 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
         # --- Visualising outputs during training ---
         if epoch % epochs_per_visualise == 0:
             visualise_intermediate_training_outputs(model, monitor_dataset, './monitor_dir',
-                                                    epoch)
+                                                    epoch, device)
 
     print('Training Completed. Best Val Loss: {:.3f}'.format(best_epoch_val_loss))
 

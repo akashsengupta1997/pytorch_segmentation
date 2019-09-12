@@ -18,12 +18,16 @@ def visualise_images_masks(images, masks):
     plt.show()
 
 
-def visualise_intermediate_training_outputs(model, monitor_dataset, save_dir, epoch):
+def visualise_intermediate_training_outputs(model, monitor_dataset, save_dir, epoch, device):
     with torch.no_grad():
         for i in range(len(monitor_dataset)):
             image = monitor_dataset[i]
             image = torch.unsqueeze(image, dim=0)
+            image = image.to(device)
             output = model(image)
+
+            output = output.to('cpu')
+            image = image.to('cpu')
             output = output.detach().numpy()
             output = np.transpose(output, [0, 2, 3, 1])
             seg_map = np.argmax(output, axis=-1)
