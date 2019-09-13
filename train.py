@@ -25,6 +25,8 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
 
         train_loss_sum = 0.0
         val_loss_sum = 0.0
+        val_num_corrects = 0
+        val_total_pixels = 0
 
         # --- Training ---
         model.train()
@@ -63,12 +65,16 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
                 val_loss = criterion(outputs, masks)
 
                 val_loss_sum += val_loss.item() * images.size()[0]  # mean -> sum for loss
+                val_num_corrects += torch.sum(torch.argmax(outputs, dim=1) == masks)
+                val_total_pixels += images.shape[0] * images.shape[2] * images.shape[3]
 
         epoch_train_loss = train_loss_sum/len(train_dataset)
         epoch_val_loss = val_loss_sum/len(val_dataset)
-        print('Finished Epoch: {:d}, Train Loss: {:.3f}, Val Loss: {:.3f}'.format(epoch + 1,
-                                                                                  epoch_train_loss,
-                                                                                  epoch_val_loss))
+        print('Finished Epoch: {:d}, Train Loss: {:.3f}, Val Loss: {:.3f}, '
+              'Val Acc: {:.2f}'.format(epoch + 1,
+                                       epoch_train_loss,
+                                       epoch_val_loss,
+                                       100*float(val_num_corrects)/val_total_pixels))
         # --- Saving best model ---
         if epoch_val_loss < best_epoch_val_loss:
             best_model_wts = copy.deepcopy(model.state_dict())

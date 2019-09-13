@@ -28,7 +28,7 @@ batches_per_print = 1
 epochs_per_visualise = 50
 epochs_per_save = 50
 
-random_rotate_range = 40
+random_rotate_range = 10
 random_crop_min_height_scale = 0.8
 random_crop_min_width_scale = 0.8
 
