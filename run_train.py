@@ -9,10 +9,10 @@ from models.enet import ENet
 from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
 from data.dataset import SegmentationDataset, ImageFolder
-from data.tranforms import Resize, ToTensor, PadToSquare
+from data.tranforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop
 from train import train_model
 
-# --- Hyperparameters ---
+# --- Hyperparameters, Dimensions, Visualisation parameters ---
 
 batch_size = 3
 val_batch_size = 1
@@ -28,6 +28,10 @@ batches_per_print = 1
 epochs_per_visualise = 50
 epochs_per_save = 50
 
+random_rotate_range = 40
+random_crop_min_height_scale = 0.8
+random_crop_min_width_scale = 0.8
+
 # --- Load Dataset ---
 image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/images3/train"
 label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/masks3/train"
@@ -35,7 +39,10 @@ val_image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s3
 val_label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/masks3/val"
 monitor_image_dir = "./monitor_dir/images/"
 
-dataset_transforms = {'train': transforms.Compose([PadToSquare(),
+dataset_transforms = {'train': transforms.Compose([RandomCrop(random_crop_min_height_scale,
+                                                              random_crop_min_width_scale),
+                                                   RandomRotate(random_rotate_range),
+                                                   PadToSquare(),
                                                    Resize(input_height,
                                                           input_width,
                                                           output_height,
@@ -72,7 +79,7 @@ class_weights = enet_style_bounded_log_weighting(label_dir, output_height, outpu
 # class_weights = median_frequency_balancing(label_dir, output_height, output_width,
 #                                                   num_classes)
 class_weights.to(device)
-criterion = nn.CrossEntropyLoss(weight=class_weights)
+criterion = nn.CrossEntropyLoss(weight=None)
 # criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=class_weights)
 optimiser = optim.Adam(model.parameters())
 
@@ -84,7 +91,7 @@ trained_model = train_model(model,
                             optimiser,
                             batch_size,
                             val_batch_size,
-                            './saved_models/enet_test.tar',
+                            './saved_models/lol.tar',
                             device,
                             num_epochs=num_epochs,
                             batches_per_print=batches_per_print,

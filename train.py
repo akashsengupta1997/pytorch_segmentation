@@ -15,6 +15,7 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
 
     best_model_wts = copy.deepcopy(model.state_dict())
     best_epoch_val_loss = np.inf
+    best_epoch = 0
 
     model.to(device)
 
@@ -72,6 +73,7 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
         if epoch_val_loss < best_epoch_val_loss:
             best_model_wts = copy.deepcopy(model.state_dict())
             best_epoch_val_loss = epoch_val_loss
+            best_epoch = epoch
 
         if epoch % epochs_per_save == 0:
             torch.save({'epoch': epoch,
@@ -79,7 +81,8 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
                         'optimiser_state_dict': optimiser.state_dict(),
                         'loss': loss},
                        model_save_path)
-            print('Model saved! Best Val Loss: {:.3f}'.format(best_epoch_val_loss))
+            print('Model saved! Best Val Loss: {:.3f} in epoch {}'.format(best_epoch_val_loss,
+                                                                          best_epoch))
 
         # --- Visualising outputs during training ---
         if epoch % epochs_per_visualise == 0:
