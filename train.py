@@ -6,9 +6,9 @@ from vis_utils import visualise_images_masks, visualise_intermediate_training_ou
 
 
 def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, optimiser,
-                batch_size, val_batch_size, model_save_path, device, num_epochs=100,
-                batches_per_print=10, epochs_per_visualise=10, epochs_per_save=10,
-                visualise_training_data=False):
+                batch_size, val_batch_size, model_save_path, device, monitor_dir_path,
+                num_epochs=100, batches_per_print=10, epochs_per_visualise=10,
+                epochs_per_save=10, visualise_training_data=False):
 
     train_dataloader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
     val_dataloader = DataLoader(val_dataset, batch_size=val_batch_size, shuffle=False)
@@ -92,7 +92,7 @@ def train_model(model, train_dataset, val_dataset, monitor_dataset, criterion, o
 
         # --- Visualising outputs during training ---
         if epoch % epochs_per_visualise == 0:
-            visualise_intermediate_training_outputs(model, monitor_dataset, './monitor_dir',
+            visualise_intermediate_training_outputs(model, monitor_dataset, monitor_dir_path,
                                                     epoch, device)
 
     print('Training Completed. Best Val Loss: {:.3f}'.format(best_epoch_val_loss))

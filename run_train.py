@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -37,7 +38,8 @@ image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/tr
 label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/masks3/train"
 val_image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/images3/val"
 val_label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/masks3/val"
-monitor_image_dir = "./monitor_dir/images/"
+monitor_dir = "./monitor_dir/"
+monitor_image_dir = os.path.join(monitor_dir, 'images')
 
 dataset_transforms = {'train': transforms.Compose([RandomCrop(random_crop_min_height_scale,
                                                               random_crop_min_width_scale),
@@ -93,6 +95,7 @@ trained_model = train_model(model,
                             val_batch_size,
                             './saved_models/lol.tar',
                             device,
+                            monitor_dir,
                             num_epochs=num_epochs,
                             batches_per_print=batches_per_print,
                             epochs_per_visualise=epochs_per_visualise,
