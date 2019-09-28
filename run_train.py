@@ -9,6 +9,7 @@ from models.pspnet import PSPNet
 from models.enet import ENet
 from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
+from losses.class_weighting import simple_bg_down_weight
 from data.dataset import SegmentationDataset, ImageFolder
 from data.tranforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop
 from train import train_model
@@ -29,16 +30,16 @@ batches_per_print = 1
 epochs_per_visualise = 50
 epochs_per_save = 50
 
-random_rotate_range = 10
-random_crop_min_height_scale = 0.8
-random_crop_min_width_scale = 0.8
+random_rotate_range = 70
+random_crop_min_height_scale = 0.45
+random_crop_min_width_scale = 0.7
 
 # --- Load Dataset ---
-image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/images3/train"
-label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/masks3/train"
-val_image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/images3/val"
-val_label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/trial/masks3/val"
-monitor_dir = "./monitor_dir/"
+image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/s31_padded/images/train"
+label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/s31_padded/masks/train"
+val_image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/s31_padded/val_images/val"
+val_label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/s31_padded/val_masks/val"
+monitor_dir = "./monitor_dir1/"
 monitor_image_dir = os.path.join(monitor_dir, 'images')
 
 dataset_transforms = {'train': transforms.Compose([RandomCrop(random_crop_min_height_scale,
@@ -75,14 +76,15 @@ print('Device: {}'.format(device))
 
 # --- Model, loss and optimiser ---
 
-model = ENet(num_classes)
-class_weights = enet_style_bounded_log_weighting(label_dir, output_height, output_width,
-                                                 num_classes)
+model = PSPNet(num_classes)
+# class_weights = enet_style_bounded_log_weighting(label_dir, output_height, output_width,
+#                                                  num_classes)
 # class_weights = median_frequency_balancing(label_dir, output_height, output_width,
 #                                                   num_classes)
-class_weights.to(device)
-criterion = nn.CrossEntropyLoss(weight=None)
-# criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=class_weights)
+# class_weights = simple_bg_down_weight(0.1, num_classes)
+# class_weights.to(device)
+# criterion = nn.CrossEntropyLoss(weight=None)
+criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=None)
 optimiser = optim.Adam(model.parameters())
 
 trained_model = train_model(model,

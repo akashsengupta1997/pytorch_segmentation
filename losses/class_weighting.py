@@ -53,3 +53,11 @@ def median_frequency_balancing(mask_dir, mask_h, mask_w, num_classes, mask_forma
     class_weights = torch.from_numpy(class_weights.astype(np.float32))
 
     return class_weights
+
+
+def simple_bg_down_weight(bg_weight, num_classes):
+    class_weights = np.ones(num_classes)
+    class_weights[0] = bg_weight
+    class_weights = torch.from_numpy(class_weights.astype(np.float32))
+
+    return class_weights
