@@ -127,3 +127,27 @@ class RandomCrop(object):
                                   crop_origin_y:crop_origin_y + new_width]
 
             return {'image': cropped_image, 'mask': cropped_mask}
+
+
+class RandomHorizFlip(object):
+    def __init__(self, classes_to_swap, flip_probability):
+        self.classes_to_swap = classes_to_swap
+        self.flip_probability = flip_probability
+
+    def __call__(self, sample):
+        if isinstance(sample, dict):
+            image, mask = sample['image'], sample['mask']
+            image = image.astype(np.float32)
+            mask = mask.astype(np.int64)
+
+            if np.random.uniform() < self.flip_probability:
+                image = cv2.flip(image, flipCode=1)
+                mask = cv2.flip(mask, flipCode=1)
+                mask_copy = np.copy(mask)
+
+                for classes in self.classes_to_swap:
+                    mask[np.where(mask_copy == classes[0])] = classes[1]
+                    mask[np.where(mask_copy == classes[1])] = classes[0]
+
+            return {'image': image, 'mask': mask}
+

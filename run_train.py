@@ -11,7 +11,7 @@ from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
 from losses.class_weighting import simple_bg_down_weight
 from data.dataset import SegmentationDataset, ImageFolder
-from data.tranforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop
+from data.tranforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop, RandomHorizFlip
 from train import train_model
 
 # --- Hyperparameters, Dimensions, Visualisation parameters ---
@@ -30,9 +30,13 @@ batches_per_print = 1
 epochs_per_visualise = 50
 epochs_per_save = 50
 
-random_rotate_range = 70
-random_crop_min_height_scale = 0.45
-random_crop_min_width_scale = 0.7
+random_rotate_range = 0
+random_crop_min_height_scale = 1.0
+random_crop_min_width_scale = 1.0
+random_horiz_flip_prob = 0.5
+horiz_flip_classes_to_swap = [(1, 14), (2, 15), (3, 16), (4, 17), (5, 18), (6, 19), (7, 20),
+                              (8, 21), (9, 22), (10, 23), (11, 24), (12, 25), (13, 26),
+                              (27, 28), (29, 30)]
 
 # --- Load Dataset ---
 image_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s31/s31_padded/images/train"
@@ -42,7 +46,9 @@ val_label_dir = "/Users/Akash_Sengupta/Documents/4th_year_project_datasets/up-s3
 monitor_dir = "./monitor_dir1/"
 monitor_image_dir = os.path.join(monitor_dir, 'images')
 
-dataset_transforms = {'train': transforms.Compose([RandomCrop(random_crop_min_height_scale,
+dataset_transforms = {'train': transforms.Compose([RandomHorizFlip(horiz_flip_classes_to_swap,
+                                                                   random_horiz_flip_prob),
+                                                   RandomCrop(random_crop_min_height_scale,
                                                               random_crop_min_width_scale),
                                                    RandomRotate(random_rotate_range),
                                                    PadToSquare(),
@@ -82,7 +88,7 @@ model = PSPNet(num_classes)
 # class_weights = median_frequency_balancing(label_dir, output_height, output_width,
 #                                                   num_classes)
 # class_weights = simple_bg_down_weight(0.1, num_classes)
-# class_weights.to(device)
+# class_weights = class_weights.to(device)
 # criterion = nn.CrossEntropyLoss(weight=None)
 criterion = cross_entropy_with_aux_loss_pspnet(aux_weight=0.4, class_weights=None)
 optimiser = optim.Adam(model.parameters())
