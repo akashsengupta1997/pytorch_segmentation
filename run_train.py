@@ -10,7 +10,7 @@ from models.enet import ENet
 from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
 from losses.class_weighting import simple_bg_down_weight
-from data.dataset import SegmentationDataset, ImageFolder
+from data.dataset import UPS31Dataset, ImageFolder
 from data.tranforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop, RandomHorizFlip
 from train import train_model
 
@@ -30,9 +30,9 @@ batches_per_print = 1
 epochs_per_visualise = 50
 epochs_per_save = 50
 
-random_rotate_range = 0
-random_crop_min_height_scale = 1.0
-random_crop_min_width_scale = 1.0
+random_rotate_range = 70
+random_crop_min_height_scale = 0.4
+random_crop_min_width_scale = 0.7
 random_horiz_flip_prob = 0.5
 horiz_flip_classes_to_swap = [(1, 14), (2, 15), (3, 16), (4, 17), (5, 18), (6, 19), (7, 20),
                               (8, 21), (9, 22), (10, 23), (11, 24), (12, 25), (13, 26),
@@ -64,12 +64,12 @@ dataset_transforms = {'train': transforms.Compose([RandomHorizFlip(horiz_flip_cl
                                                         output_width),
                                                  ToTensor()])}
 
-train_dataset = SegmentationDataset(image_dir=image_dir,
-                                    label_dir=label_dir,
-                                    transform=dataset_transforms['train'])
-val_dataset = SegmentationDataset(image_dir=val_image_dir,
-                                  label_dir=val_label_dir,
-                                  transform=dataset_transforms['val'])
+train_dataset = UPS31Dataset(image_dir=image_dir,
+                             label_dir=label_dir,
+                             transform=dataset_transforms['train'])
+val_dataset = UPS31Dataset(image_dir=val_image_dir,
+                           label_dir=val_label_dir,
+                           transform=dataset_transforms['val'])
 monitor_dataset = ImageFolder(monitor_image_dir,
                               transform=dataset_transforms['val'])
 

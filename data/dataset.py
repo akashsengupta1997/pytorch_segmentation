@@ -6,11 +6,12 @@ from torch.utils.data import Dataset
 import numpy as np
 
 
-class SegmentationDataset(Dataset):
+class UPS31Dataset(Dataset):
     def __init__(self, image_dir, label_dir, transform=None, image_format=".png",
-                 label_format=".png"):
+                 label_format=".png", use_surreal_labels=False):
         self.transform = transform
         self.image_format = image_format
+        self.use_surreal_labels=use_surreal_labels
 
         self.image_paths = [os.path.join(image_dir, f) for f in sorted(os.listdir(image_dir))
                             if f.endswith(image_format)]
@@ -30,6 +31,10 @@ class SegmentationDataset(Dataset):
         image = io.imread(self.image_paths[index])
         image = image.astype(float)/255.0
         mask = cv2.imread(self.label_paths[index], 0)
+
+        if self.use_surreal_labels:
+            pass  #TODO ups31 to surreal labels conversion
+
         sample = {"image": image, "mask": mask}
 
         if self.transform:

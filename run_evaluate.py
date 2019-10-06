@@ -7,7 +7,7 @@ from models.pspnet import PSPNet
 from models.enet import ENet
 from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
-from data.dataset import SegmentationDataset, ImageFolder
+from data.dataset import UPS31Dataset, ImageFolder
 from data.tranforms import Resize, ToTensor, PadToSquare
 from evaluate import evaluate
 
@@ -33,9 +33,9 @@ eval_transforms = transforms.Compose([PadToSquare(),
                                              output_width),
                                       ToTensor()])
 
-eval_dataset = SegmentationDataset(image_dir=image_dir,
-                                   label_dir=label_dir,
-                                   transform=eval_transforms)
+eval_dataset = UPS31Dataset(image_dir=image_dir,
+                            label_dir=label_dir,
+                            transform=eval_transforms)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 print('Eval images found: {}'.format(len(eval_dataset)))
