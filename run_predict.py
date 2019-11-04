@@ -5,7 +5,7 @@ from models.unet import UNet
 from models.pspnet import PSPNet
 from models.enet import ENet
 from data.dataset import ImageFolder
-from data.tranforms import Resize, ToTensor, PadToSquare
+from data.transforms import Resize, ToTensor, PadToSquare
 from predict import predict
 
 

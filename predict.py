@@ -16,11 +16,12 @@ def predict(model, saved_model_path, predict_dataset, batch_size, save_dir, devi
 
     with torch.no_grad():
         for num, images in enumerate(predict_dataloader):
-            images.to(device)
+            print('Batch:', num)
+            images = images.to(device)
             outputs = model(images)
 
-            outputs.to('cpu')
-            images.to('cpu')
+            outputs = outputs.to('cpu')
+            images = images.to('cpu')
             seg_maps = np.argmax(np.transpose(outputs.detach().numpy(), [0, 2, 3, 1]), axis=-1)
             images = images.detach().numpy()
             images = np.transpose(images, [0, 2, 3, 1])

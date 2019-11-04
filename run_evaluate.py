@@ -8,7 +8,7 @@ from models.enet import ENet
 from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
 from data.dataset import UPS31Dataset, ImageFolder
-from data.tranforms import Resize, ToTensor, PadToSquare
+from data.transforms import Resize, ToTensor, PadToSquare
 from evaluate import evaluate
 
 

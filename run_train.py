@@ -11,7 +11,7 @@ from losses.losses import cross_entropy_with_aux_loss_pspnet
 from losses.class_weighting import enet_style_bounded_log_weighting, median_frequency_balancing
 from losses.class_weighting import simple_bg_down_weight
 from data.dataset import UPS31Dataset, ImageFolder
-from data.tranforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop, RandomHorizFlip
+from data.transforms import Resize, ToTensor, PadToSquare, RandomRotate, RandomCrop, RandomHorizFlip
 from train import train_model
 
 # --- Hyperparameters, Dimensions, Visualisation parameters ---
